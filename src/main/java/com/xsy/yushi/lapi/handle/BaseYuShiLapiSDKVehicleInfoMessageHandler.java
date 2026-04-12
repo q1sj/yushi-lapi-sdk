@@ -7,12 +7,11 @@ import com.xsy.yushi.lapi.enums.VehicleTypeEnum;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.text.ParseException;
+import java.util.*;
 
 /**
  * @author Q1sj
@@ -40,6 +39,16 @@ public abstract class BaseYuShiLapiSDKVehicleInfoMessageHandler extends BaseYuSh
 				.orElse(Collections.emptyList());
 		for (VehicleInfo vehicleInfo : vehicleInfos) {
 			Vehicle vehicle = new Vehicle();
+			// 抓拍时间
+			vehicle.setPassTime(Optional.ofNullable(vehicleInfo).map(VehicleInfo::getPassTime)
+					.map(passTime -> {
+						try {
+							return DateUtils.parseDate(passTime, "yyyyMMddHHmmssSSS");
+						} catch (ParseException e) {
+							log.warn("宇视LAPI卡口抓拍时间:{}解析失败 使用当前时间", passTime);
+							return new Date();
+						}
+					}).orElseGet(Date::new));
 			// 车辆颜色
 			vehicle.setCarColor(Optional.ofNullable(vehicleInfo)
 					.map(VehicleInfo::getVehicleAttributeInfo)
@@ -84,6 +93,7 @@ public abstract class BaseYuShiLapiSDKVehicleInfoMessageHandler extends BaseYuSh
 
 	@Data
 	public static class Vehicle {
+		private Date passTime;
 		private String carNo;
 		private ColorEnum carNoColor;
 		private VehicleTypeEnum carType;
