@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.List;
 
 /**
@@ -29,9 +30,23 @@ public class YuShiLapiInit {
 		}
 		for (YuShiLapiConfig config : lapi) {
 			try {
-				yuShiLapiSDK.subscription(config);
+				boolean subscription = yuShiLapiSDK.subscription(config);
+				if (!subscription) {
+					log.error("宇视lapi sdk订阅失败 {}", config);
+				}
 			} catch (Exception e) {
-				log.error("宇视lapi sdk订阅失败 {}", config);
+				log.error("宇视lapi sdk订阅失败 {} {}", config, e.getMessage(), e);
+			}
+		}
+	}
+
+	@PreDestroy
+	public void destroy() {
+		for (YuShiLapiConfig config : yuShiLapiConfigs.getLapi()) {
+			try {
+				yuShiLapiSDK.stopSubscription(config);
+			} catch (Exception e) {
+				log.error("宇视lapi sdk取消订阅失败 {}", config);
 			}
 		}
 	}

@@ -1,7 +1,9 @@
 package com.xsy.yushi.lapi.config;
 
+import com.xsy.device.config.car.CarDeviceConfig;
 import com.xsy.yushi.lapi.enums.ImageDataTypeEnum;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,16 +12,9 @@ import java.util.Map;
  * @author Q1sj
  * @date 2026/4/10 下午2:31
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class YuShiLapiConfig {
-	// 填写 设备ip
-	public String ip = "33.74.104.12";
-	// 填写 设备port
-	public int port = 80;
-	// 填写 设备登录用户名username
-	public String username = "admin";
-	// 填写 设备登录密码password
-	public String password = "Yhjs-1234";
+public class YuShiLapiConfig extends CarDeviceConfig {
 	/**
 	 * 数据发送目的IP地址类型
 	 * 0:IPv4 1:IPv6 2:域名 3:IPv4和IPv6都需要。当前仅支持IPv4
@@ -28,7 +23,7 @@ public class YuShiLapiConfig {
 	/**
 	 * 数据发送目的IPv4地址
 	 */
-	public String receiveAlarmDataAddress = "33.65.218.17";
+	public String receiveAlarmDataAddress;
 	/**
 	 * 数据发送目的端口，范围为[1, 65535]
 	 */
@@ -58,5 +53,10 @@ public class YuShiLapiConfig {
 
 	public String getSubscribeURL() {
 		return "http://" + ip + ":" + port + "/LAPI/V1.0/System/Event/Subscription";
+	}
+
+	public YuShiLapiConfig() {
+		super();
+		this.port = 80;
 	}
 }

@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Q1sj
@@ -14,5 +15,5 @@ import java.util.List;
 @Configuration
 @ConfigurationProperties(prefix = "device-configs.yushi")
 public class YuShiLapiConfigs {
-	private List<YuShiLapiConfig> lapi;
+	private List<YuShiLapiConfig> lapi = new CopyOnWriteArrayList<>();
 }
