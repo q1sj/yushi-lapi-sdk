@@ -34,9 +34,9 @@ public class YuShiLapiSDK {
 
 	public boolean subscription(YuShiLapiConfig config) {
 		AtomicBoolean isSubscription = new AtomicBoolean(false);
-		SuscribeThread suscribeThread = SUSCRIBE_THREAD_MAP.compute(config.getSubscribeURL(), (k, v) -> {
+		SUSCRIBE_THREAD_MAP.compute(config.getSubscribeURL(), (k, v) -> {
 			if (v != null && !v.isStop() && v.getSubscribeId() > 0) {
-				log.info("订阅已存在 {}", k);
+				log.info("订阅已存在 不重复订阅{}", k);
 				isSubscription.set(true);
 				return v;
 			}
@@ -53,7 +53,6 @@ public class YuShiLapiSDK {
 		if (!isSubscription.get()) {
 			return false;
 		}
-		SUSCRIBE_THREAD_MAP.put(config.getSubscribeURL(), suscribeThread);
 		LISTEN_THREAD_MAP.computeIfAbsent(config.getReceiveAlarmDataPort(), port -> {
 			ListenThread thread = new ListenThread(port, handlers, configs);
 			thread.start();
