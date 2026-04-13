@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Q1sj
@@ -32,12 +33,26 @@ public class YuShiLapiSDK {
 	}
 
 	public boolean subscription(YuShiLapiConfig config) {
-		SuscribeThread suscribeThread = new SuscribeThread(config);
-		if (suscribeThread.subscribe() == -1) {
-			log.error("config:{}订阅失败", config);
+		AtomicBoolean isSubscription = new AtomicBoolean(false);
+		SuscribeThread suscribeThread = SUSCRIBE_THREAD_MAP.compute(config.getSubscribeURL(), (k, v) -> {
+			if (v != null && !v.isStop() && v.getSubscribeId() > 0) {
+				log.info("订阅已存在 {}", k);
+				isSubscription.set(true);
+				return v;
+			}
+			SuscribeThread thread = new SuscribeThread(config);
+			if (thread.subscribe() == -1) {
+				log.error("config:{}订阅失败", config);
+				isSubscription.set(false);
+			} else {
+				isSubscription.set(true);
+				thread.start();
+			}
+			return thread;
+		});
+		if (!isSubscription.get()) {
 			return false;
 		}
-		suscribeThread.start();
 		SUSCRIBE_THREAD_MAP.put(config.getSubscribeURL(), suscribeThread);
 		LISTEN_THREAD_MAP.computeIfAbsent(config.getReceiveAlarmDataPort(), port -> {
 			ListenThread thread = new ListenThread(port, handlers, configs);

@@ -5,6 +5,7 @@ import com.uni.beans.Response.LAPIResponse;
 import com.uni.utils.http.HttpResult;
 import com.uni.utils.http.LAPIHttpConnection;
 import com.xsy.yushi.lapi.config.YuShiLapiConfig;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -13,6 +14,7 @@ public class SuscribeThread extends Thread {
 
 	private YuShiLapiConfig config;
 	private LAPIHttpConnection http;
+	@Getter
 	private int subscribeId = 0;
 
 
@@ -155,6 +157,10 @@ public class SuscribeThread extends Thread {
 		// 取消订阅
 		cancelSubscription(this.subscribeId);
 		// Log.info("停止订阅成功");
+	}
+
+	public boolean isStop() {
+		return isStop;
 	}
 
 }
